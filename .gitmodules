@@ -1,3 +1,6 @@
 [submodule "lib/mana"]
 	path = lib/mana
 	url = https://github.com/nickbedner/mana
+[submodule "lib/hack-and-slash-rpg-server"]
+	path = lib/hack-and-slash-rpg-server
+	url = https://github.com/nickbedner/hack-and-slash-rpg-server
