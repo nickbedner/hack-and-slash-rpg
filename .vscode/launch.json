@@ -1,0 +1,25 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      //https://github.com/conan-io/conan/issues/1839
+      //https://github.com/Microsoft/vscode-cpptools/blob/master/launch.md#environment
+      //https://stackoverflow.com/questions/44749665/can-i-replace-calling-the-cmake-ggenerator-option-and-calling-vcvarsall-bat-b
+      //https://vector-of-bool.github.io/docs/vscode-cmake-tools/getting_started.html#gs-configuring
+      "name": "HNS Launch",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${command:cmake.launchTargetPath}",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build",
+      "environment": [],
+      "externalConsole": false,
+      "internalConsoleOptions": "openOnSessionStart",
+      "console": "internalConsole"
+    }
+  ]
+}
