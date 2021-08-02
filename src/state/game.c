@@ -27,6 +27,29 @@ void game_init(struct Game* game, struct Mana* mana, struct Window* window) {
   // TODO: Implement async asset loading
   // Load game assets
   resource_manager_init(&game->resource_manager, gpu_api);
+
+  struct Noise noise = {0};
+  int size = 32;
+  float STEP = 1.0f / size;
+  //noise.noise_type = SPHERE_NOISE;
+  //sphere_noise_init(&noise.sphere_noise);
+  //noise.sphere_noise.step = STEP;
+  //noise.sphere_noise.sphere_origin[0] = size / 2;
+  //noise.sphere_noise.sphere_origin[1] = size / 2;
+  //noise.sphere_noise.sphere_origin[2] = size / 2;
+  noise.noise_type = RIDGED_FRACTAL_NOISE;
+  ridged_fractal_noise_init(&noise.ridged_fractal_noise);
+  noise.ridged_fractal_noise.octave_count = 4;
+  noise.ridged_fractal_noise.frequency = 1.0;
+  noise.ridged_fractal_noise.lacunarity = 2.2324f;
+  noise.ridged_fractal_noise.step = STEP;
+
+  struct Vector* noises = calloc(1, sizeof(struct Vector));
+  vector_init(noises, sizeof(struct Noise));
+  vector_push_back(noises, &noise);
+
+  manifold_dual_contouring_shader_init(&game->planet_shader, &mana->engine.gpu_api);
+  manifold_planet_init(&game->planet, &mana->engine.gpu_api, size, &game->planet_shader, noises, (vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f});
 }
 
 void game_delete(struct Game* game, struct Mana* mana) {
@@ -39,6 +62,12 @@ void game_delete(struct Game* game, struct Mana* mana) {
   struct MapIter render_list_iter = map_iter();
   while ((render_list_key = map_next(&game->render_registry.registry, &render_list_iter)))
     sprite_delete(&((struct Render*)map_get(&game->render_registry.registry, render_list_key))->sprite, gpu_api);
+
+  vector_delete(&game->planet.noises);
+  free(&game->planet.noises);
+
+  manifold_planet_delete(&game->planet, gpu_api);
+  manifold_dual_contouring_shader_delete(&game->planet_shader, gpu_api);
 
   // Delete ecs
   component_registry_delete(&game->render_registry);
@@ -79,6 +108,10 @@ void game_update(struct Game* game, struct Mana* mana, double delta_time) {
   // Start blitting to the gbuffer
   gbuffer_start(gpu_api->vulkan_state->gbuffer, gpu_api->vulkan_state);
   game_render_entities(game, gpu_api, &sorted_render_list);
+
+  manifold_planet_update_uniforms(&game->planet, gpu_api, &game->player_camera, (vec3){.x = 0.0f, .y = 0.0f, .z = 0.0f});
+  manifold_planet_render(&game->planet, gpu_api);
+
   gbuffer_stop(gpu_api->vulkan_state->gbuffer, gpu_api->vulkan_state);
   // Free memory allocated inside arraylist
   array_list_delete(&sorted_render_list);

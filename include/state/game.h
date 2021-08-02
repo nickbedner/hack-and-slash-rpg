@@ -12,8 +12,10 @@
 #include <core/scenery.h>
 #include <mana/audio/audiomanager.h>
 #include <mana/core/inputmanager.h>
+#include <mana/graphics/entities/manifoldplanet.h>
 #include <mana/graphics/entities/sprite.h>
 #include <mana/graphics/shaders/fxaashader.h>
+#include <mana/graphics/shaders/manifolddualcontouringshader.h>
 #include <mana/graphics/shaders/spriteanimationshader.h>
 #include <mana/graphics/shaders/spriteshader.h>
 #include <mana/graphics/utilities/camera.h>
@@ -40,6 +42,9 @@ struct Game {
 
   struct JobSystem job_system;
   struct ResourceManager resource_manager;
+
+  struct ManifoldDualContouringShader planet_shader;
+  struct ManifoldPlanet planet;
 };
 
 void game_init(struct Game* game, struct Mana* mana, struct Window* window);
